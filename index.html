@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六一快乐🎈</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Microsoft YaHei';
+        }
+        #greeting {
+            position: absolute;
+            top: 20%;
+            width: 100%;
+            text-align: center;
+            color: #ff69b4;
+            z-index: 100;
+            font-size: 2em;
+            text-shadow: 0 0 10px white;
+        }
+        canvas {
+            display: block;
+        }
+        .input-box {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+        }
+        input {
+            padding: 10px;
+            font-size: 1.2em;
+            border: 2px solid #ff69b4;
+            border-radius: 5px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background: #ff69b4;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="greeting"></div>
+    <div class="input-box">
+        <input type="text" id="name" placeholder="输入你的名字">
+        <button onclick="startFireworks()">开启惊喜🎁</button>
+    </div>
+    <canvas id="fireworks"></canvas>
+
+    <script>
+        let fireworks = [];
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function startFireworks() {
+            document.querySelector('.input-box').style.display = 'none';
+            const name = document.getElementById('name').value || '猪猪小朋友';
+            document.getElementById('greeting').innerHTML = `
+                <h2>${name}小朋友六一快乐！</h2>
+                <p>点击屏幕绽放你的专属烟花🎆</p>
+            `;
+            
+            // 烟花初始化
+            canvas.addEventListener('click', createFirework);
+            animate();
+        }
+
+        function createFirework(e) {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // 烟花粒子参数
+            for(let i = 0; i < 100; i++) {
+                fireworks.push({
+                    x,
+                    y,
+                    vx: Math.random() * 10 - 5,
+                    vy: Math.random() * 10 - 7,
+                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                    radius: Math.random() * 2 + 1,
+                    alpha: 1
+                });
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            fireworks.forEach((particle, index) => {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.alpha -= 0.01;
+
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI*2);
+                ctx.fillStyle = particle.color;
+                ctx.globalAlpha = particle.alpha;
+                ctx.fill();
+
+                if(particle.alpha <= 0) {
+                    fireworks.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+    </script>
+</body>
+</html>
